@@ -7,7 +7,7 @@ class Perfil extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Portfólio"),
+        title: const Text("Portfolio"),
         backgroundColor: Colors.blue,
       ),
       body: SingleChildScrollView(
