@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:projetoflutter/aula03/Pesquisar.dart';
+import 'pesquisar.dart';
 
 class Aula03 extends StatelessWidget {
   const Aula03({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Pesquisas(),
+      title: 'Pesquisa de receitas',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+        useMaterial3: true,
+      ),
+      home: const Pesquisas(),
     );
   }
 }
-

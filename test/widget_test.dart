@@ -1,31 +1,69 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:projetoflutter/main.dart';
-import '';
+import 'package:projetoflutter/aula03/aula03.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
+  testWidgets('Bloqueia pesquisa vazia e somente com espaços', (tester) async {
     await tester.pumpWidget(const Aula03());
+    for (final texto in ['', '   ']) {
+      await tester.enterText(find.byType(TextField), texto);
+      await tester.tap(find.text('Pesquisar'));
+      await tester.pumpAndSettle();
+      expect(find.text('Digite o nome de uma receita para pesquisar.'), findsOneWidget);
+      expect(find.text('Resultados da pesquisa'), findsNothing);
+    }
+  });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  testWidgets('Pesquisa, abre detalhes, volta e permite nova consulta', (tester) async {
+    await tester.pumpWidget(const Aula03());
+    await tester.enterText(find.byType(TextField), '  BoLo   de cenoura  ');
+    await tester.tap(find.text('Pesquisar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Pesquisa: BoLo de cenoura'), findsOneWidget);
+    await tester.tap(find.text('Bolo de cenoura'));
+    await tester.pumpAndSettle();
+    expect(find.text('Detalhes da receita'), findsOneWidget);
+    expect(find.text('Ingredientes'), findsOneWidget);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.text('Pesquisa: BoLo de cenoura'), findsOneWidget);
+    await tester.tap(find.text('Nova pesquisa'));
+    await tester.pumpAndSettle();
+    expect(find.widgetWithText(TextField, '  BoLo   de cenoura  '), findsOneWidget);
+    await tester.enterText(find.byType(TextField), 'panqueca');
+    await tester.tap(find.text('Pesquisar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Panqueca de banana'), findsOneWidget);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  testWidgets('Sem resultados permite corrigir a consulta', (tester) async {
+    await tester.pumpWidget(const Aula03());
+    await tester.enterText(find.byType(TextField), 'xyz');
+    await tester.tap(find.text('Pesquisar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Receitas encontradas: 0'), findsOneWidget);
+    expect(find.textContaining('Nenhuma receita encontrada.'), findsOneWidget);
+    await tester.tap(find.text('Nova pesquisa'));
+    await tester.pumpAndSettle();
+    expect(find.byType(TextField), findsOneWidget);
+  });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  testWidgets('Nova pesquisa nos detalhes retorna à primeira tela', (tester) async {
+    await tester.pumpWidget(const Aula03());
+    await tester.enterText(find.byType(TextField), 'panqueca');
+    await tester.tap(find.text('Pesquisar'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Panqueca de banana'));
+    await tester.pumpAndSettle();
+    final botao = find.widgetWithText(TextButton, 'Nova pesquisa');
+    await tester.scrollUntilVisible(
+      botao,
+      200,
+      scrollable: find.byType(Scrollable),
+    );
+    await tester.tap(botao);
+    await tester.pumpAndSettle();
+    expect(find.byType(TextField), findsOneWidget);
+    expect(find.byType(BackButton), findsNothing);
   });
 }

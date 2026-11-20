@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:projetoflutter/aula02/Perfil.dart';
+import 'package:projetoflutter/aula02/perfil.dart';
 
 class Principal extends StatelessWidget {
   const Principal ({super.key});
